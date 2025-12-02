@@ -4,6 +4,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabaseClient';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 
 
@@ -28,15 +29,18 @@ export default function Home(){
   <div>
     <h1>Bienvenue sur CyberQuiz</h1>
 
-    {question ? (
-      <div>
-        <h2>{question.texte}</h2> 
-      </div>
-    ) : (
-      <p>Chargement de la question...</p>
-    )}
-
+   {question ? (
+  <Card className="max-w-xl mx-auto mt-6">
+    <CardHeader>
+      <CardTitle>Question</CardTitle>
+    </CardHeader>
+    <CardContent>
+      <p>{question.texte}</p>
+    </CardContent>
+  </Card>
+) : (
+  <p>Chargement de la question...</p>
+)}
   </div>
 )
-
 }
