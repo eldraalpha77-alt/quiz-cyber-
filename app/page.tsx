@@ -10,10 +10,20 @@ import {
   AlertDescription,
   AlertTitle,
 } from "@/components/ui/alert"
-
-
-
-
+import { Button } from "@/components/ui/button";
+      const { data, error } = await supabase
+        .from('question')
+        .select(`
+          id,
+          texte,
+          reponses:reponse (
+            id,
+            texte,
+            est_correcte
+          )
+        `)
+        .order('id', { ascending: true });
+        
 export default function Home() {
   const [question, setQuestion] = useState<any>(null);
   const [afficherAlerte, setAfficherAlerte] = useState<boolean>(false);
@@ -21,26 +31,33 @@ export default function Home() {
     async function fetchQuestion() {
       const { data, error } = await supabase
         .from('question')
-        .select('*');
+        .select(`
+          id,
+          texte,
+          reponses:reponse (
+            id,
+            texte,
+            est_correcte  
+          )        
+        `)
 
-      if (error) console.error(error);
+      if (error) console.log(error);
       else setQuestion(data[0]); // On stocke la première question dans l’état
     }
-    const question = {
-      texte: "Quel est le mot de passe le plus sécurisé ?",
-      reponses: [
-        "123456",
-        "azerty",
-        "Une phrase longue avec des caractères spéciaux"
-      ],
-    };
 
     fetchQuestion();
-
-
     // setAfficherAlerte(true);
   }, []);
 
+
+  function handleClick(reponse: any) {
+    if (reponse.est_correcte) {
+      alert("Bonne réponse !");
+    } else {
+      alert("Mauvaise réponse.");
+    }
+  }
+  
 
   return (
     <div>
@@ -53,22 +70,33 @@ export default function Home() {
         </AlertDescription>
       </Alert>
       {question ? (
-        <Card className="max-w-xl mx-auto mt-6">
-          <CardHeader>
-            <CardTitle>Question</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p>{question.texte}</p>
-          </CardContent>
-        </Card>
+        <div>
+          <Card className="max-w-xl mx-auto mt-6">
+            <CardHeader>
+              <CardTitle>Question</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p>{question.texte}</p>
+            </CardContent>
+          </Card>
+          <Card>
+          {question.reponses.map((reponse: any) => (
+            <Button
+              key={reponse.id}
+              onClick={() => handleClick(reponse)}
+              className="w-full justify-start mt-4"
+              variant="outline"
+            >
+              {reponse.texte}
+            </Button>
+          ))}
+          </Card>
+        </div>
       ) : (
         <p>Chargement de la question...</p>
       )}
-      {question.reponses.map((reponse, index) => (
-        <button key={index} onClick={() => handleClick(reponse)}>
-          {reponse}
-        </button>
-      ))}
+
+
 
     </div>
   )
